@@ -1,0 +1,5 @@
+Zendesk Suite Team: $55/agent/month (annual). Includes ticketing, messaging, 1 help center, basic AI.
+Zendesk Suite Professional: $115/agent/month. Adds CSAT, skills-based routing, advanced reporting.
+Zendesk Suite Enterprise: custom quote. Includes custom roles, sandbox, advanced AI agent controls.
+AI add-ons may increase effective seat cost. Per-seat pricing is public for Team and Professional.
+Enterprise minimum seats are not published on the public pricing page.

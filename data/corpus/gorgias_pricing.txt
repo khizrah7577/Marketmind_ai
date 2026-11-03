@@ -1,0 +1,4 @@
+Gorgias Basic: from about $10/month depending on ticket volume tiers (not pure per-seat).
+Gorgias Pro and Advanced scale with ticket volume.
+AI Agent features billed based on automation/help interactions in curated notes.
+Entry pricing is volume-based rather than classic per-agent SaaS seating alone.

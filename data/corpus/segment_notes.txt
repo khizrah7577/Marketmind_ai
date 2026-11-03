@@ -1,0 +1,5 @@
+Enterprise buyers prioritise security, sandboxing, custom roles, and Salesforce/ServiceNow alignment.
+SMB buyers prioritise transparent pricing, fast time-to-value, and Shopify/email workflows.
+Mid-market often starts on Freshdesk/Intercom/Gorgias and expands AI add-ons.
+PLANTED GAP: No document in this corpus states Vendor Capacity's enterprise minimum seat count.
+PLANTED GAP: No document covers Latin America-specific regulatory requirements for AI support bots.

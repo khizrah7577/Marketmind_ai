@@ -1,0 +1,5 @@
+Freshdesk (Freshworks) provides ticketing and omnichannel support with Freddy AI features.
+Target segments: SMB and mid-market; strong presence in cost-sensitive buyers.
+AI capabilities: Freddy AI insights, ticket summarisation, reply suggestions, chatbot.
+HQ: San Mateo / Chennai. Channels: email, portal, chat, phone (with add-ons).
+Integrations: CRM connectors, Slack, Microsoft Teams, marketplace apps.

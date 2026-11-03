@@ -1,0 +1,6 @@
+Forethought provides generative AI for support: AutoFlow, Triage, and Solve products.
+Target segments: mid-market and enterprise support orgs already on Salesforce or Zendesk.
+AI capabilities: automated workflows, intelligent triage, knowledge-grounded answers.
+HQ: San Francisco. Channels: works inside existing ticketing platforms.
+Integrations: Zendesk, Salesforce Service Cloud, others via partners.
+Public list pricing is not published; enterprise contracts.

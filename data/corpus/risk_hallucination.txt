@@ -1,0 +1,5 @@
+Risks for buyers:
+- Hallucinated policy answers creating compliance exposure.
+- Opaque resolution metrics inflated by vendors.
+- Lock-in via knowledge bases and workflow graphs.
+- Workforce change management when automation rates rise.

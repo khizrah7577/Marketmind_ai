@@ -1,0 +1,8 @@
+Zendesk provides omnichannel customer support software used by mid-market and enterprise teams.
+Product family includes Zendesk Support, Zendesk Suite, and AI agents powered by Ultimate.ai acquisition.
+Target segments: mid-market and enterprise contact centers.
+AI capabilities: ticket triage, generative agent replies, knowledge suggestions, sentiment detection.
+HQ: San Francisco, USA. Channels: email, chat, voice, social, messaging.
+Integrations: Salesforce, Slack, Shopify, Jira, custom via API.
+Published entry pricing for Suite Team starts at $55 per agent per month (annual billing).
+Enterprise pricing is custom and sold via sales-assisted deals.

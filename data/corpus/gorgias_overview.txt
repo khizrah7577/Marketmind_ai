@@ -1,0 +1,5 @@
+Gorgias is a helpdesk aimed at ecommerce brands, especially Shopify merchants.
+Target segments: SMB ecommerce.
+AI capabilities: AI agent assist, automation rules, order management actions in tickets.
+HQ: San Francisco. Channels: email, chat, social, SMS.
+Integrations: Shopify, Magento, BigCommerce, ReCharge, Klaviyo.

@@ -1,0 +1,5 @@
+Key trends:
+1) Shift from assistive AI (draft replies) to autonomous resolution agents.
+2) Pricing innovation: resolution-based and outcome-based AI fees alongside seats.
+3) Platform gravity: incumbents (Zendesk, Salesforce) bundling AI vs specialists (Ada, Forethought).
+4) Grounding and hallucination controls becoming procurement requirements.

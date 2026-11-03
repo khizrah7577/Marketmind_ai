@@ -1,0 +1,6 @@
+Salesforce Service Cloud embeds Einstein / Agentforce AI into enterprise service operations.
+Target segments: enterprise.
+AI capabilities: Agentforce service agents, case classification, knowledge recommendations, Einstein GPT replies.
+HQ: San Francisco. Channels: omnichannel service console, digital engagement.
+Integrations: deep Salesforce ecosystem.
+Pricing is enterprise SKU + AI add-ons; not meaningfully comparable to SMB per-seat pages.

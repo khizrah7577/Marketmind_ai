@@ -1,0 +1,5 @@
+Help Scout provides shared inbox and knowledge base tools for SMB support teams.
+Target segments: SMB.
+AI capabilities: AI Assist drafts and summaries; lighter automation than specialist AI-agent vendors.
+HQ: remote-first USA. Channels: email-first, chat (Beacon), docs.
+Integrations: Shopify, Slack, Jira, Zapier.

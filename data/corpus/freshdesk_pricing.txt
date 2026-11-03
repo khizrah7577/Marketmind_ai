@@ -1,0 +1,4 @@
+Freshdesk Growth: $15/agent/month (annual).
+Freshdesk Pro: $49/agent/month (annual) — includes more automation and Freddy AI features at this tier in curated notes.
+Freshdesk Enterprise: $79/agent/month (annual) — advanced security and custom roles.
+Freddy AI add-ons may apply depending on session pack.

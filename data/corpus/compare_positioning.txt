@@ -1,0 +1,8 @@
+Positioning snapshot:
+- Zendesk: broad platform + AI agents for mid-market/enterprise.
+- Intercom: conversational/product-led + Fin resolution pricing.
+- Freshdesk: value leader for SMB/mid-market.
+- Ada / Forethought: automation specialists.
+- Gorgias: ecommerce vertical.
+- Salesforce Service Cloud: enterprise suite gravity.
+- Help Scout: simple SMB inbox with light AI.

@@ -1,0 +1,5 @@
+Intercom offers Fin, an AI customer service agent, alongside the Intercom Messenger platform.
+Target segments: SMB to mid-market SaaS and ecommerce, expanding upmarket.
+AI capabilities: Fin AI Agent resolves common support queries from help center content; Fin Copilot assists human agents.
+HQ: San Francisco / Dublin. Channels: in-app messenger, email, chat.
+Integrations: HubSpot, Salesforce, Slack, Stripe, Shopify.
