@@ -22,12 +22,24 @@ app = typer.Typer(add_completion=False, no_args_is_help=True)
 console = Console()
 
 
+def _require_cli_key():
+    settings = get_settings()
+    if not settings.has_api_key():
+        console.print(
+            "[red]No OpenAI API key configured.[/red] "
+            "For CLI use, set OPENAI_API_KEY in the environment or a local .env file. "
+            "For the web app, connect a key in the Streamlit UI instead."
+        )
+        raise typer.Exit(code=1)
+    return settings
+
+
 @app.command()
 def smoke() -> None:
     """One real API call: model, tokens, cost; masked key."""
     from src.llm.client import LLMError
 
-    settings = get_settings()
+    settings = _require_cli_key()
     setup_logging(settings.log_level)
     console.print(f"api_key (masked): {settings.masked_key()}")
     usage = UsageTracker(run_id=f"smoke_{uuid4().hex[:8]}")
@@ -58,7 +70,7 @@ def research(
     ),
 ) -> None:
     """Full pipeline ending in human approval gate."""
-    settings = get_settings()
+    settings = _require_cli_key()
     setup_logging(settings.log_level)
     if len(request) > settings.max_request_chars:
         raise typer.BadParameter(f"Request too long (>{settings.max_request_chars})")
@@ -125,7 +137,7 @@ def demo_tools() -> None:
 @app.command()
 def show_messages() -> None:
     """Demonstrate context assembly: print exact message list for one call."""
-    settings = get_settings()
+    settings = _require_cli_key()
     setup_logging(settings.log_level)
     usage = UsageTracker(run_id="msg_demo")
     client = LLMClient(settings, usage)

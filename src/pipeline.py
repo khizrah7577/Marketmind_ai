@@ -27,8 +27,18 @@ logger = logging.getLogger(__name__)
 
 
 class Pipeline:
-    def __init__(self, settings: Settings | None = None):
-        self.settings = settings or get_settings()
+    def __init__(
+        self,
+        settings: Settings | None = None,
+        *,
+        api_key: str | None = None,
+    ):
+        base = settings or get_settings()
+        if api_key:
+            base = base.with_api_key(api_key)
+        # Research requires a key; Streamlit supplies it from session_state
+        base.require_api_key()
+        self.settings = base
 
     def run(
         self,

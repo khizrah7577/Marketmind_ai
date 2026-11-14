@@ -1,4 +1,4 @@
-"""MarketMind AI — Streamlit UI (opens in your browser)."""
+"""MarketMind AI — Streamlit UI with runtime OpenAI API key authentication."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
 
 import streamlit as st
 
+from src.auth.openai_auth import mask_api_key, validate_openai_api_key
 from src.config import get_settings
 from src.logging_setup import setup_logging
 from src.pipeline import Pipeline
@@ -27,20 +28,45 @@ DEFAULT_REQUEST = (
     "and prepare a business intelligence report."
 )
 
+API_KEYS_URL = "https://platform.openai.com/api-keys"
+
 
 def _init_state() -> None:
     defaults = {
+        "openai_api_key": None,
+        "openai_connected": False,
+        "openai_masked": "",
+        "auth_error": None,
         "phase": "input",  # input | running | review | done
         "research_state": None,
         "usage": None,
         "client": None,
         "dispatcher": None,
+        "pipeline": None,
         "error": None,
         "message": None,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
+
+
+def _is_connected() -> bool:
+    return bool(
+        st.session_state.get("openai_connected")
+        and st.session_state.get("openai_api_key")
+    )
+
+
+def _disconnect() -> None:
+    st.session_state.openai_api_key = None
+    st.session_state.openai_connected = False
+    st.session_state.openai_masked = ""
+    st.session_state.auth_error = None
+    # Drop any in-flight research that depended on the prior client
+    st.session_state.client = None
+    st.session_state.pipeline = None
+    st.session_state.dispatcher = None
 
 
 def _claim_counts(state) -> dict[str, int]:
@@ -50,34 +76,103 @@ def _claim_counts(state) -> dict[str, int]:
     return counts
 
 
-def main() -> None:
-    _init_state()
+def _render_connect_screen() -> None:
+    st.markdown(
+        """
+        <div style="max-width:640px;margin:2.5rem auto 1rem auto;text-align:center;">
+          <h1 style="margin-bottom:0.25rem;">MarketMind AI</h1>
+          <p style="opacity:0.85;font-size:1.05rem;">
+            Connect your OpenAI account to continue
+          </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    left, center, right = st.columns([1, 2, 1])
+    with center:
+        st.info(
+            "Your API key stays in this browser session only. "
+            "It is never written to disk, GitHub, or application source code."
+        )
+        api_key = st.text_input(
+            "OpenAI API Key",
+            type="password",
+            placeholder="sk-… or sk-proj-…",
+            help="Paste a key from your OpenAI account. It will not be shown after connect.",
+        )
+        connect = st.button("Connect OpenAI", type="primary", use_container_width=True)
+
+        if st.session_state.auth_error:
+            st.error(st.session_state.auth_error)
+
+        st.caption(
+            f"Get your API key from [{API_KEYS_URL}]({API_KEYS_URL}). "
+            "OpenAI billing/credits are required on your own account."
+        )
+
+        if connect:
+            with st.spinner("Validating API key with OpenAI…"):
+                base = get_settings()
+                result = validate_openai_api_key(
+                    api_key,
+                    base_url=base.openai_base_url,
+                    timeout_seconds=min(30.0, base.request_timeout_seconds),
+                )
+            if result.ok:
+                st.session_state.openai_api_key = api_key.strip()
+                st.session_state.openai_connected = True
+                st.session_state.openai_masked = result.masked_key or mask_api_key(
+                    api_key
+                )
+                st.session_state.auth_error = None
+                st.rerun()
+            else:
+                st.session_state.auth_error = result.message
+                st.session_state.openai_api_key = None
+                st.session_state.openai_connected = False
+                st.rerun()
+
+
+def _render_app() -> None:
+    settings = get_settings()
     st.title("MarketMind AI")
     st.caption(
         "Autonomous business research agent — plan, gather evidence, QC, then human approval."
     )
 
     with st.sidebar:
-        st.header("Settings")
-        try:
-            settings = get_settings()
-            st.success(f"API key loaded: `{settings.masked_key()}`")
-            st.write(f"Budget: **${settings.run_budget_usd:.2f}**")
-            st.write(f"Max iterations: **{settings.max_iterations}**")
-        except SystemExit as e:
-            st.error(str(e))
-            st.stop()
-        except Exception as e:
-            st.error(f"Config error: {e}")
-            st.stop()
+        st.header("Connection")
+        st.success(f"OpenAI connected: `{st.session_state.openai_masked}`")
+        if st.button("Disconnect API key", use_container_width=True):
+            _disconnect()
+            st.rerun()
 
-        if st.button("Reset app", use_container_width=True):
+        st.divider()
+        st.header("Run settings")
+        st.write(f"Budget: **${settings.run_budget_usd:.2f}**")
+        st.write(f"Max iterations: **{settings.max_iterations}**")
+        st.caption("Models and caps can be overridden via optional env vars.")
+
+        if st.button("Reset research session", use_container_width=True):
+            key = st.session_state.openai_api_key
+            masked = st.session_state.openai_masked
+            connected = st.session_state.openai_connected
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
+            _init_state()
+            st.session_state.openai_api_key = key
+            st.session_state.openai_masked = masked
+            st.session_state.openai_connected = connected
             st.rerun()
 
     if st.session_state.error:
-        st.error(st.session_state.error)
+        # Sanitize accidental key leakage in exception strings
+        err = str(st.session_state.error)
+        key = st.session_state.openai_api_key or ""
+        if key and key in err:
+            err = err.replace(key, st.session_state.openai_masked or "***")
+        st.error(err)
 
     if st.session_state.message:
         st.info(st.session_state.message)
@@ -105,12 +200,12 @@ def main() -> None:
     # -------- RUNNING --------
     if st.session_state.phase == "running":
         st.warning(
-            "Research is running — this can take several minutes and uses API credits."
+            "Research is running — this can take several minutes and uses your OpenAI credits."
         )
         progress = st.progress(0, text="Starting pipeline…")
         try:
-            setup_logging(get_settings().log_level)
-            pipe = Pipeline()
+            setup_logging(settings.log_level)
+            pipe = Pipeline(api_key=st.session_state.openai_api_key)
             progress.progress(15, text="Analysing request & planning…")
             state, usage, client, dispatcher = pipe.run_until_approval(
                 st.session_state._pending_request,
@@ -127,13 +222,17 @@ def main() -> None:
             st.rerun()
         except Exception as e:
             st.session_state.phase = "input"
-            st.session_state.error = f"Run failed: {e}"
+            msg = str(e)
+            key = st.session_state.openai_api_key or ""
+            if key and key in msg:
+                msg = msg.replace(key, st.session_state.openai_masked or "***")
+            st.session_state.error = f"Run failed: {msg}"
             st.rerun()
 
     # -------- REVIEW / APPROVAL --------
     if st.session_state.phase in {"review", "done"}:
         state = st.session_state.research_state
-        report = state.draft_report
+        report = state.draft_report if state else None
         if report is None:
             st.error("No draft report available.")
             st.stop()
@@ -229,7 +328,9 @@ def main() -> None:
         with tabs[4]:
             if state.plan:
                 st.json(state.plan.model_dump())
-            st.write(f"Tool calls: {state.tool_call_count} | Iterations: {state.iteration}")
+            st.write(
+                f"Tool calls: {state.tool_call_count} | Iterations: {state.iteration}"
+            )
             st.json(state.tool_history[-20:])
 
         if st.session_state.phase == "review":
@@ -289,13 +390,17 @@ def main() -> None:
                             )
                         st.rerun()
                     except Exception as e:
-                        st.session_state.error = str(e)
+                        msg = str(e)
+                        key = st.session_state.openai_api_key or ""
+                        if key and key in msg:
+                            msg = msg.replace(
+                                key, st.session_state.openai_masked or "***"
+                            )
+                        st.session_state.error = msg
                         st.rerun()
 
         if st.session_state.phase == "done":
-            decision = (
-                report.approval.decision if report.approval else "n/a"
-            )
+            decision = report.approval.decision if report.approval else "n/a"
             if decision == "approve":
                 st.success(
                     f"Published. Open `runs/{state.run_id}/published_report.md`"
@@ -304,6 +409,15 @@ def main() -> None:
                 st.warning("Rejected — nothing published.")
             else:
                 st.info(f"Finished with decision: {decision}")
+
+
+def main() -> None:
+    _init_state()
+    # App always starts — OpenAI features wait for a connected session key
+    if not _is_connected():
+        _render_connect_screen()
+        return
+    _render_app()
 
 
 if __name__ == "__main__":

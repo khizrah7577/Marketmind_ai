@@ -33,8 +33,9 @@ class LLMError(Exception):
 
 class LLMClient:
     def __init__(self, settings: Settings, usage: UsageTracker):
+        api_key = settings.require_api_key()
         kwargs: dict[str, Any] = {
-            "api_key": settings.openai_api_key,
+            "api_key": api_key,
             "timeout": settings.request_timeout_seconds,
             "max_retries": 0,  # we handle retries ourselves
         }
@@ -140,7 +141,10 @@ class LLMClient:
                 }
             except AuthenticationError as e:
                 logger.error("AUTH_ERROR stage=%s detail=%s", stage, _safe_err(e))
-                raise LLMError("authentication", "API key rejected. Check OPENAI_API_KEY.") from e
+                raise LLMError(
+                    "authentication",
+                    "API key rejected. Reconnect with a valid OpenAI API key.",
+                ) from e
             except RateLimitError as e:
                 last_err = e
                 wait = _backoff(attempt)

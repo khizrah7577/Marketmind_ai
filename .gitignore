@@ -6,6 +6,8 @@
 *.key
 credentials*.json
 secrets.*
+.streamlit/secrets.toml
+.streamlit/secrets.*.toml
 
 # Virtual environments
 .venv/

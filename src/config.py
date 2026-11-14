@@ -1,4 +1,8 @@
-"""Validated settings: models, temperatures, budgets, caps."""
+"""Validated settings: models, temperatures, budgets, caps.
+
+OPENAI_API_KEY is optional at process start so the Streamlit app can boot
+and collect a user-supplied key at runtime.
+"""
 
 from __future__ import annotations
 
@@ -25,6 +29,12 @@ DATA_DIR = ROOT_DIR / "data"
 CORPUS_DIR = DATA_DIR / "corpus"
 RUNS_DIR = ROOT_DIR / "runs"
 
+_PLACEHOLDERS = {
+    "",
+    "sk-your-key-here",
+    "replace-with-your-openai-api-key",
+}
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -33,7 +43,8 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    openai_api_key: str = Field(..., alias="OPENAI_API_KEY")
+    # Optional: Streamlit supplies this via session; CLI may use .env
+    openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
     openai_base_url: str | None = Field(default=None, alias="OPENAI_BASE_URL")
 
     model_analyser: str = Field(default="gpt-4o-mini", alias="MODEL_ANALYSER")
@@ -64,15 +75,32 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     max_request_chars: int = 4000
 
-    @field_validator("openai_api_key")
+    @field_validator("openai_api_key", mode="before")
     @classmethod
-    def key_must_exist(cls, v: str) -> str:
-        if not v or v.strip() in {"", "sk-your-key-here"}:
+    def normalize_key(cls, v: object) -> str | None:
+        if v is None:
+            return None
+        s = str(v).strip()
+        if s in _PLACEHOLDERS:
+            return None
+        return s
+
+    def has_api_key(self) -> bool:
+        return bool(self.openai_api_key)
+
+    def require_api_key(self) -> str:
+        if not self.openai_api_key:
             raise ValueError(
-                "OPENAI_API_KEY is missing or still the placeholder. "
-                "Copy .env.example to .env and set a real key."
+                "OpenAI API key is required. Connect a key in the Streamlit UI "
+                "or set OPENAI_API_KEY for CLI use."
             )
-        return v.strip()
+        return self.openai_api_key
+
+    def with_api_key(self, api_key: str) -> "Settings":
+        key = (api_key or "").strip()
+        if not key or key in _PLACEHOLDERS:
+            raise ValueError("API key is empty or still a placeholder.")
+        return self.model_copy(update={"openai_api_key": key})
 
     def model_for(self, stage: StageName) -> str:
         return getattr(self, f"model_{stage}")
@@ -81,7 +109,7 @@ class Settings(BaseSettings):
         return getattr(self, f"temp_{stage}")
 
     def masked_key(self) -> str:
-        k = self.openai_api_key
+        k = self.openai_api_key or ""
         if len(k) < 12:
             return "***"
         return f"{k[:7]}...{k[-4:]}"
@@ -89,13 +117,9 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    try:
-        return Settings()  # type: ignore[call-arg]
-    except Exception as exc:
-        msg = str(exc)
-        if "OPENAI_API_KEY" in msg or "openai_api_key" in msg:
-            raise SystemExit(
-                "FATAL: required environment variable OPENAI_API_KEY is missing or invalid. "
-                "Create .env from .env.example and set OPENAI_API_KEY."
-            ) from exc
-        raise
+    """Load non-secret app settings. Does not require OPENAI_API_KEY."""
+    return Settings()  # type: ignore[call-arg]
+
+
+def clear_settings_cache() -> None:
+    get_settings.cache_clear()
