@@ -21,6 +21,7 @@ st.set_page_config(
     page_title="MarketMind AI",
     page_icon="📊",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 DEFAULT_REQUEST = (
@@ -29,6 +30,28 @@ DEFAULT_REQUEST = (
 )
 
 API_KEYS_URL = "https://platform.openai.com/api-keys"
+STYLES_PATH = ROOT / "assets" / "styles.css"
+
+
+def _apply_theme() -> None:
+    if STYLES_PATH.exists():
+        st.markdown(
+            f"<style>{STYLES_PATH.read_text(encoding='utf-8')}</style>",
+            unsafe_allow_html=True,
+        )
+
+
+def _page_header(kicker: str, title: str, description: str) -> None:
+    st.markdown(
+        f"""
+        <div class="mm-page-header">
+          <div class="mm-page-kicker">{kicker}</div>
+          <h1 class="mm-page-title">{title}</h1>
+          <p class="mm-page-desc">{description}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def _init_state() -> None:
@@ -76,80 +99,112 @@ def _claim_counts(state) -> dict[str, int]:
     return counts
 
 
-def _render_connect_screen() -> None:
+def _render_sidebar_brand() -> None:
     st.markdown(
         """
-        <div style="max-width:640px;margin:2.5rem auto 1rem auto;text-align:center;">
-          <h1 style="margin-bottom:0.25rem;">MarketMind AI</h1>
-          <p style="opacity:0.85;font-size:1.05rem;">
-            Connect your OpenAI account to continue
-          </p>
+        <div class="mm-brand">
+          <div class="mm-brand-mark">Financial Intelligence</div>
+          <div class="mm-brand-title">MarketMind AI</div>
+          <div class="mm-brand-sub">Autonomous market research desk</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    left, center, right = st.columns([1, 2, 1])
-    with center:
-        st.info(
-            "Your API key stays in this browser session only. "
-            "It is never written to disk, GitHub, or application source code."
-        )
-        api_key = st.text_input(
-            "OpenAI API Key",
-            type="password",
-            placeholder="sk-… or sk-proj-…",
-            help="Paste a key from your OpenAI account. It will not be shown after connect.",
-        )
-        connect = st.button("Connect OpenAI", type="primary", use_container_width=True)
 
-        if st.session_state.auth_error:
-            st.error(st.session_state.auth_error)
-
-        st.caption(
-            f"Get your API key from [{API_KEYS_URL}]({API_KEYS_URL}). "
-            "OpenAI billing/credits are required on your own account."
+def _render_connect_screen() -> None:
+    _apply_theme()
+    with st.sidebar:
+        _render_sidebar_brand()
+        st.caption("Session security")
+        st.write(
+            "API keys stay in this browser session only. "
+            "Nothing is written to disk or source control."
         )
 
-        if connect:
-            with st.spinner("Validating API key with OpenAI…"):
-                base = get_settings()
-                result = validate_openai_api_key(
-                    api_key,
-                    base_url=base.openai_base_url,
-                    timeout_seconds=min(30.0, base.request_timeout_seconds),
-                )
-            if result.ok:
-                st.session_state.openai_api_key = api_key.strip()
-                st.session_state.openai_connected = True
-                st.session_state.openai_masked = result.masked_key or mask_api_key(
-                    api_key
-                )
-                st.session_state.auth_error = None
-                st.rerun()
-            else:
-                st.session_state.auth_error = result.message
-                st.session_state.openai_api_key = None
-                st.session_state.openai_connected = False
-                st.rerun()
+    st.markdown('<div class="mm-connect-wrap">', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="mm-connect-hero">
+          <span class="mm-badge">Secure connection</span>
+          <h1>MarketMind AI</h1>
+          <p>Connect your OpenAI account to continue</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<div class="mm-card">', unsafe_allow_html=True)
+    st.info(
+        "Your API key stays in this browser session only. "
+        "It is never written to disk, GitHub, or application source code."
+    )
+    api_key = st.text_input(
+        "OpenAI API Key",
+        type="password",
+        placeholder="sk-… or sk-proj-…",
+        help="Paste a key from your OpenAI account. It will not be shown after connect.",
+    )
+    connect = st.button("Connect OpenAI", type="primary", use_container_width=True)
+
+    if st.session_state.auth_error:
+        st.error(st.session_state.auth_error)
+
+    st.caption(
+        f"Get your API key from [{API_KEYS_URL}]({API_KEYS_URL}). "
+        "OpenAI billing/credits are required on your own account."
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    if connect:
+        with st.spinner("Validating API key with OpenAI…"):
+            base = get_settings()
+            result = validate_openai_api_key(
+                api_key,
+                base_url=base.openai_base_url,
+                timeout_seconds=min(30.0, base.request_timeout_seconds),
+            )
+        if result.ok:
+            st.session_state.openai_api_key = api_key.strip()
+            st.session_state.openai_connected = True
+            st.session_state.openai_masked = result.masked_key or mask_api_key(
+                api_key
+            )
+            st.session_state.auth_error = None
+            st.rerun()
+        else:
+            st.session_state.auth_error = result.message
+            st.session_state.openai_api_key = None
+            st.session_state.openai_connected = False
+            st.rerun()
 
 
 def _render_app() -> None:
+    _apply_theme()
     settings = get_settings()
-    st.title("MarketMind AI")
-    st.caption(
-        "Autonomous business research agent — plan, gather evidence, QC, then human approval."
-    )
 
     with st.sidebar:
-        st.header("Connection")
+        _render_sidebar_brand()
+        st.markdown("**Workspace**")
+        phase = st.session_state.phase
+        nav_labels = {
+            "input": "Research brief",
+            "running": "Research running",
+            "review": "Approval desk",
+            "done": "Published / archived",
+        }
+        st.caption(f"Current stage: {nav_labels.get(phase, phase)}")
+
+        st.divider()
+        st.markdown("**Connection**")
         st.success(f"OpenAI connected: `{st.session_state.openai_masked}`")
         if st.button("Disconnect API key", use_container_width=True):
             _disconnect()
             st.rerun()
 
         st.divider()
-        st.header("Run settings")
+        st.markdown("**Run settings**")
         st.write(f"Budget: **${settings.run_budget_usd:.2f}**")
         st.write(f"Max iterations: **{settings.max_iterations}**")
         st.caption("Models and caps can be overridden via optional env vars.")
@@ -166,6 +221,26 @@ def _render_app() -> None:
             st.session_state.openai_connected = connected
             st.rerun()
 
+    phase = st.session_state.phase
+    if phase in {"review", "done"}:
+        _page_header(
+            "Approval desk",
+            "Research review packet",
+            "Inspect evidence, QC status, and claim types — then approve, reject, expand, or rescope.",
+        )
+    elif phase == "running":
+        _page_header(
+            "Execution",
+            "Research in progress",
+            "The agent loop is gathering evidence within your budget and iteration caps.",
+        )
+    else:
+        _page_header(
+            "Research workspace",
+            "MarketMind AI",
+            "Autonomous business research agent — plan, gather evidence, QC, then human approval.",
+        )
+
     if st.session_state.error:
         # Sanitize accidental key leakage in exception strings
         err = str(st.session_state.error)
@@ -179,6 +254,18 @@ def _render_app() -> None:
 
     # -------- INPUT --------
     if st.session_state.phase == "input":
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Budget ceiling", f"${settings.run_budget_usd:.2f}")
+        m2.metric("Max iterations", f"{settings.max_iterations}")
+        m3.metric("Max tool calls", f"{settings.max_tool_calls}")
+        m4.metric("Repair rounds", f"{settings.max_repair_rounds}")
+
+        st.markdown('<div class="mm-card">', unsafe_allow_html=True)
+        st.markdown("### New research brief")
+        st.caption(
+            "Describe the market question. MarketMind will analyse scope, plan research, "
+            "gather evidence from the local corpus, and prepare an approval packet."
+        )
         request = st.text_area(
             "Research request",
             value=DEFAULT_REQUEST,
@@ -196,12 +283,16 @@ def _render_app() -> None:
             st.session_state._pending_request = request.strip()
             st.session_state._auto_assume = auto_assume
             st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # -------- RUNNING --------
     if st.session_state.phase == "running":
+        st.markdown('<div class="mm-running">', unsafe_allow_html=True)
         st.warning(
             "Research is running — this can take several minutes and uses your OpenAI credits."
         )
+        st.caption("Do not close this tab while the pipeline is executing.")
+        st.markdown("</div>", unsafe_allow_html=True)
         progress = st.progress(0, text="Starting pipeline…")
         try:
             setup_logging(settings.log_level)
@@ -237,23 +328,41 @@ def _render_app() -> None:
             st.error("No draft report available.")
             st.stop()
 
-        st.subheader("Approval packet")
+        st.markdown(
+            '<div class="mm-section-label">Approval packet</div>',
+            unsafe_allow_html=True,
+        )
         c1, c2, c3, c4 = st.columns(4)
         qc = state.qc_verdict or {}
-        c1.metric("QC", "PASS" if qc.get("pass") else "FAIL")
+        qc_pass = bool(qc.get("pass"))
+        c1.metric("QC", "PASS" if qc_pass else "FAIL")
         c2.metric("Confidence", report.confidence_level)
         c3.metric("Evidence", len(state.evidence))
         c4.metric("Cost USD", f"{report.run_cost:.4f}")
 
+        qc_pill = "mm-pill-pass" if qc_pass else "mm-pill-fail"
+        qc_label = "PASS" if qc_pass else "FAIL"
+        claim_mix = _claim_counts(state)
+        st.markdown(
+            f'<span class="mm-pill {qc_pill}">QC {qc_label}</span>'
+            f'<span class="mm-pill mm-pill-fact">fact {claim_mix.get("fact", 0)}</span>'
+            f'<span class="mm-pill mm-pill-inference">inference {claim_mix.get("inference", 0)}</span>'
+            f'<span class="mm-pill mm-pill-recommendation">recommendation {claim_mix.get("recommendation", 0)}</span>'
+            f'<span class="mm-pill mm-pill-uncertainty">uncertainty {claim_mix.get("uncertainty", 0)}</span>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown('<div class="mm-card">', unsafe_allow_html=True)
         st.markdown(f"**Objective:** {report.research_objective}")
         if report.assumptions:
             st.markdown("**Assumptions:**")
             for a in report.assumptions:
                 st.markdown(f"- {a}")
 
-        st.markdown(f"**Claim mix:** `{_claim_counts(state)}`")
+        st.markdown(f"**Claim mix:** `{claim_mix}`")
         if report.incomplete:
             st.warning(f"Incomplete run: {state.incomplete_reason}")
+        st.markdown("</div>", unsafe_allow_html=True)
 
         with st.expander("Limitations & gaps", expanded=True):
             for g in report.limitations_and_gaps:
@@ -276,6 +385,7 @@ def _render_app() -> None:
             ]
         )
         with tabs[0]:
+            st.markdown('<div class="mm-card">', unsafe_allow_html=True)
             st.write(report.executive_summary or "_(empty)_")
             if report.market_overview:
                 st.markdown(
@@ -290,15 +400,23 @@ def _render_app() -> None:
                 st.markdown("**Recommendations**")
                 for r in report.recommendations:
                     st.markdown(f"- {r.statement}")
+            st.markdown("</div>", unsafe_allow_html=True)
 
         with tabs[1]:
             for e in state.evidence:
+                pill = f"mm-pill-{e.claim_type}"
                 st.markdown(
-                    f"`{e.evidence_id}` **[{e.claim_type}]** ({e.confidence})  \n"
-                    f"{e.claim}  \n"
-                    f"_source: {e.source_detail or e.source_ref}_"
+                    f"""
+                    <div class="mm-evidence {e.claim_type}">
+                      <span class="mm-pill {pill}">{e.claim_type}</span>
+                      <span class="mm-pill mm-pill-fact">{e.confidence}</span>
+                      <code>{e.evidence_id}</code>
+                      <div style="margin-top:0.45rem;">{e.claim}</div>
+                      <div class="mm-evidence-meta">source: {e.source_detail or e.source_ref}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
                 )
-                st.divider()
 
         with tabs[2]:
             if report.competitor_analysis.matrix:
@@ -318,24 +436,36 @@ def _render_app() -> None:
                 st.info("No comparison matrix yet.")
 
         with tabs[3]:
+            st.markdown('<div class="mm-card">', unsafe_allow_html=True)
             try:
                 md_path = write_markdown_report(state)
                 st.markdown(md_path.read_text(encoding="utf-8"))
             except Exception as e:
                 st.write(report.model_dump())
                 st.caption(f"Markdown render note: {e}")
+            st.markdown("</div>", unsafe_allow_html=True)
 
         with tabs[4]:
+            st.markdown('<div class="mm-card">', unsafe_allow_html=True)
             if state.plan:
                 st.json(state.plan.model_dump())
             st.write(
                 f"Tool calls: {state.tool_call_count} | Iterations: {state.iteration}"
             )
             st.json(state.tool_history[-20:])
+            st.markdown("</div>", unsafe_allow_html=True)
 
         if st.session_state.phase == "review":
             st.divider()
+            st.markdown('<div class="mm-card">', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="mm-section-label">Human gate</div>',
+                unsafe_allow_html=True,
+            )
             st.subheader("Human approval (required to publish)")
+            st.caption(
+                "Absence of a decision is not approval. Choose one outcome below."
+            )
             approver = st.text_input("Your name / ID", value="")
             decision = st.radio(
                 "Decision",
@@ -398,6 +528,7 @@ def _render_app() -> None:
                             )
                         st.session_state.error = msg
                         st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
 
         if st.session_state.phase == "done":
             decision = report.approval.decision if report.approval else "n/a"
@@ -413,6 +544,13 @@ def _render_app() -> None:
 
 def main() -> None:
     _init_state()
+    # Optional local design preview: /?design_preview=1
+    # Shows the research workspace chrome without requiring a real API key.
+    if st.query_params.get("design_preview") == "1" and not _is_connected():
+        st.session_state.openai_connected = True
+        st.session_state.openai_api_key = "preview-not-a-real-key"
+        st.session_state.openai_masked = "sk-prev...view"
+        st.session_state.phase = "input"
     # App always starts — OpenAI features wait for a connected session key
     if not _is_connected():
         _render_connect_screen()

@@ -8,6 +8,10 @@ Built against the OpenAI API with **tool calling**, **structured outputs**, a bo
 
 Primary deliverable: **S1 — AI customer support software**, backed by a curated local corpus under `data/corpus/` (26 documents: vendors, pricing, planted market-size contradiction, planted enterprise seat gap, planted prompt-injection page).
 
+## UI
+
+Light fintech dashboard with a deep-navy sidebar, blue accents, and card-based research / approval workspace. Styles live in `assets/styles.css` and `.streamlit/config.toml`.
+
 ## Open the app in your browser (Streamlit)
 
 No `.env` API key is required to start the app. You connect your own OpenAI key in the UI.
