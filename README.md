@@ -48,10 +48,28 @@ Optional CLI: copy `.env.example` → `.env` for `python -m src.main smoke`.
 
 ## Streamlit Cloud
 
-- Entry point: `app.py`
-- Branch: `master`
-- Do **not** commit secrets. Prefer runtime key entry in Settings; optional `OPENAI_API_KEY` in Streamlit Secrets.
-- Set working directory to repo root so `data/corpus` resolves.
+**Repo:** https://github.com/khizrah7577/Marketmind_ai  
+**Entry point:** `app.py` · **Branch:** `master` · **Working directory:** repository root
+
+### Deploy steps
+
+1. Sign in at [share.streamlit.io](https://share.streamlit.io/) with the GitHub account that owns `khizrah7577/Marketmind_ai`.
+2. **Create app** → select repository `Marketmind_ai` → branch `master` → main file `app.py`.
+3. (Optional) **Advanced settings → Secrets** — add only if you want a server-side key:
+   ```toml
+   OPENAI_API_KEY = "sk-..."
+   ```
+   Prefer leaving secrets empty and connecting the key in **Settings** at runtime (session-only).
+4. Click **Deploy**. Wait for the build to finish and open the live URL.
+5. Smoke-test: connect API key → Dashboard KPIs → Research Studio (demo or live) → Report Studio approval gate.
+
+### Persistence note
+
+Streamlit Community Cloud uses ephemeral containers. Local SQLite under `database/` and `runs/` may reset on redeploy. For durable history, use an external store or re-seed demo data after redeploy. Runtime API keys are never written to disk.
+
+### Security
+
+Do **not** commit `.env`, API keys, or `database/marketmind.db`. Keys belong in Streamlit Secrets or the in-app Settings session only.
 
 ## Tests
 
