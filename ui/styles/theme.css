@@ -1,0 +1,186 @@
+/* MarketMind AI — dark enterprise fintech theme */
+
+:root {
+  --mm-bg: #0B1020;
+  --mm-bg-2: #121A2B;
+  --mm-card: #182337;
+  --mm-accent: #8B5CF6;
+  --mm-accent-2: #38BDF8;
+  --mm-success: #22C55E;
+  --mm-warning: #F59E0B;
+  --mm-danger: #EF4444;
+  --mm-text: #F8FAFC;
+  --mm-muted: #94A3B8;
+  --mm-border: rgba(148, 163, 184, 0.18);
+  --mm-radius: 14px;
+  --mm-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+.stApp {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(139, 92, 246, 0.18), transparent),
+              radial-gradient(900px 500px at 90% 0%, rgba(56, 189, 248, 0.12), transparent),
+              var(--mm-bg) !important;
+  color: var(--mm-text);
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+section[data-testid="stSidebar"] {
+  background: linear-gradient(180deg, #0E1528 0%, #121A2B 100%) !important;
+  border-right: 1px solid var(--mm-border);
+}
+
+section[data-testid="stSidebar"] * {
+  color: var(--mm-text) !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label {
+  color: var(--mm-muted) !important;
+}
+
+.mm-brand {
+  padding: 0.5rem 0 1rem 0;
+  border-bottom: 1px solid var(--mm-border);
+  margin-bottom: 1rem;
+}
+.mm-brand-mark {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mm-accent-2) !important;
+}
+.mm-brand-title {
+  font-size: 1.35rem;
+  font-weight: 750;
+  color: var(--mm-text) !important;
+  margin: 0.15rem 0;
+}
+.mm-brand-sub {
+  font-size: 0.82rem;
+  color: var(--mm-muted) !important;
+}
+
+.mm-hero {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(56, 189, 248, 0.08));
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--mm-shadow);
+}
+.mm-hero h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  letter-spacing: -0.02em;
+}
+.mm-hero p {
+  margin: 0.35rem 0 0 0;
+  color: var(--mm-muted);
+}
+
+.mm-card {
+  background: var(--mm-card);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  padding: 1rem 1.15rem;
+  margin-bottom: 0.9rem;
+  box-shadow: var(--mm-shadow);
+}
+
+div[data-testid="stMetric"] {
+  background: var(--mm-card);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--mm-shadow);
+}
+div[data-testid="stMetric"] label { color: var(--mm-muted) !important; }
+div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+  color: var(--mm-text) !important;
+  font-weight: 700;
+}
+
+.stButton > button[kind="primary"],
+.stButton > button[data-testid="baseButton-primary"] {
+  background: linear-gradient(135deg, #8B5CF6, #6D28D9) !important;
+  border: none !important;
+  color: white !important;
+  border-radius: 12px !important;
+  font-weight: 650 !important;
+  box-shadow: 0 8px 22px rgba(139, 92, 246, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.stButton > button[kind="primary"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(139, 92, 246, 0.45);
+}
+
+.stTextInput input, .stTextArea textarea, .stSelectbox div[data-baseweb="select"] > div {
+  background: #0F172A !important;
+  color: var(--mm-text) !important;
+  border-radius: 10px !important;
+  border-color: var(--mm-border) !important;
+}
+
+.mm-pill {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-right: 0.3rem;
+}
+.mm-pill-demo { background: rgba(245, 158, 11, 0.18); color: #FBBF24; }
+.mm-pill-ok { background: rgba(34, 197, 94, 0.15); color: #4ADE80; }
+.mm-pill-warn { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+.mm-pill-bad { background: rgba(239, 68, 68, 0.15); color: #F87171; }
+
+.mm-stage {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0 1rem 0;
+}
+.mm-stage span {
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--mm-border);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.75rem;
+  color: var(--mm-muted);
+}
+.mm-stage span.active {
+  background: rgba(139, 92, 246, 0.22);
+  border-color: rgba(139, 92, 246, 0.45);
+  color: #E9D5FF;
+}
+.mm-stage span.done {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #86EFAC;
+}
+
+.mm-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--mm-muted);
+  border: 1px dashed var(--mm-border);
+  border-radius: var(--mm-radius);
+  background: rgba(24, 35, 55, 0.55);
+}
+
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+header[data-testid="stHeader"] { background: transparent; }
+
+@keyframes mmPulse {
+  0% { opacity: 0.55; }
+  50% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+.mm-live {
+  animation: mmPulse 1.6s ease-in-out infinite;
+  color: var(--mm-accent-2) !important;
+}

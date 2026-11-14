@@ -34,6 +34,8 @@ htmlcov/
 # Runtime / generated artefacts
 runs/
 evaluation/results/
+database/*.db
+database/*.db-*
 *.log
 *.tmp
 
